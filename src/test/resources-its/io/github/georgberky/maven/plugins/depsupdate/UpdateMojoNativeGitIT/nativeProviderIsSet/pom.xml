@@ -6,11 +6,6 @@
     <artifactId>native-git-provider-test</artifactId>
     <version>0.6.0</version>
 
-    <scm>
-        <connection>someConnection</connection>
-        <developerConnection>someDeveloperConnection</developerConnection>
-    </scm>
-
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
