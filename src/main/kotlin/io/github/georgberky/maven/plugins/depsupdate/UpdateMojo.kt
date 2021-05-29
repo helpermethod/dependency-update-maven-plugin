@@ -4,6 +4,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource
 import org.apache.maven.artifact.repository.ArtifactRepository
 import org.apache.maven.plugin.AbstractMojo
+import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugins.annotations.Component
 import org.apache.maven.plugins.annotations.Mojo
 import org.apache.maven.plugins.annotations.Parameter
@@ -66,7 +67,15 @@ class UpdateMojo : AbstractMojo() {
     }
 
     private fun withGit(f: (GitProvider) -> Unit) {
+        configurationCheck()
         val git = gitProvider.createProvider(mavenProject.basedir.toPath(), settings, connection);
         git.use(f)
+    }
+
+    private fun configurationCheck() {
+        if (gitProvider == GitProviderChoice.JGIT && connection.isEmpty()) {
+            throw MojoExecutionException("You chose JGIT as GitProvider. Therefore, you have to set properties " +
+                    "'developerConnectionUrl' or 'connectionUrl' dependent on the 'connectionType'")
+        }
     }
 }
