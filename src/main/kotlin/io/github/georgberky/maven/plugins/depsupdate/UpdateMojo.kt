@@ -4,6 +4,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource
 import org.apache.maven.artifact.repository.ArtifactRepository
 import org.apache.maven.plugin.AbstractMojo
+import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugins.annotations.Component
 import org.apache.maven.plugins.annotations.Mojo
 import org.apache.maven.plugins.annotations.Parameter
@@ -18,10 +19,10 @@ class UpdateMojo : AbstractMojo() {
     lateinit var localRepository: ArtifactRepository
     @Parameter(defaultValue = "\${settings}", required = true)
     lateinit var settings: Settings
-    @Parameter(property = "connectionUrl", defaultValue = "\${project.scm.connection}")
-    lateinit var connectionUrl: String
-    @Parameter(property = "developerConnectionUrl", defaultValue = "\${project.scm.developerConnection}")
-    lateinit var developerConnectionUrl: String
+    @Parameter(property = "connectionUrl", defaultValue = "\${project.scm.connection}", required = false)
+    var connectionUrl: String = ""
+    @Parameter(property = "developerConnectionUrl", defaultValue = "\${project.scm.developerConnection}", required = false)
+    var developerConnectionUrl: String = ""
     @Parameter(property = "connectionType", defaultValue = "connection", required = true)
     lateinit var connectionType: String
     @Parameter(property = "dependencyUpdate.git.provider", defaultValue="NATIVE", required = false)
@@ -66,7 +67,15 @@ class UpdateMojo : AbstractMojo() {
     }
 
     private fun withGit(f: (GitProvider) -> Unit) {
+        configurationCheck()
         val git = gitProvider.createProvider(mavenProject.basedir.toPath(), settings, connection);
         git.use(f)
+    }
+
+    private fun configurationCheck() {
+        if (gitProvider == GitProviderChoice.JGIT && connection.isEmpty()) {
+            throw MojoExecutionException("You chose JGIT as GitProvider. Therefore, you have to set properties " +
+                    "'developerConnectionUrl' or 'connectionUrl' dependent on the 'connectionType'")
+        }
     }
 }

@@ -3,8 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.georgberky.maven.plugins.depsupdate</groupId>
-    <artifactId>native-git-provider-test</artifactId>
+    <artifactId>jgit-provider-test</artifactId>
     <version>0.6.0</version>
+
+    <scm>
+        <connection>scm:git:file://</connection>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -25,6 +29,9 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>${project.artifactId}</artifactId>
                 <version>${project.version}</version>
+                <configuration>
+                    <gitProvider>JGIT</gitProvider>
+                </configuration>
             </plugin>
         </plugins>
     </build>
